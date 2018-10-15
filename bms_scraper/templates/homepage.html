@@ -28,6 +28,11 @@
       border-radius: 5%;
     }
 
+    .btn:hover {
+      background-color: #2980b9;
+      color: white;
+    }
+
   </style>
   <title>BookMyShow Event Scraper</title>
 </head>
@@ -38,13 +43,14 @@
       <p>Choose a city:</p>
       <select name="city">
         <option value="bangalore">Bengaluru</option>
-        <option value="mumbai">Mumbai</option>
+        <option value="mumbai" selected="selected">Mumbai</option>
         <option value="ncr">NCR</option>
         <option value="pune">Pune</option>
       </select>
       <br>
       <p>Choose a date-range:</p>
       <select name="date">
+        <option value="all">All</option>
         <option value="today">Today</option>
         <option value="tomorrow">Tomorrow</option>
         <option value="this">This Weekend</option>
