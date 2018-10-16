@@ -29,10 +29,10 @@ def generate_csv():
         date_range.append(datetime.datetime.now())
     elif date_filter == "tomorrow":
         date_range.append(datetime.datetime.now()+datetime.timedelta(days=1))
-    elif date_filter == "next":
+    elif date_filter == "nextweekend":
         date_range = [datetime.datetime.now()+datetime.timedelta(days=12-curr_day),
             datetime.datetime.now()+datetime.timedelta(days=13-curr_day)]
-    elif date_filter == "this":
+    elif date_filter == "thisweekend":
         #handling usual cases, searching for this weekend on a weekday
         if curr_day < 5:
             date_range = [datetime.datetime.now()+datetime.timedelta(days=5-curr_day),
@@ -78,4 +78,6 @@ def generate_csv():
     buffer.write(csv_file.getvalue().encode('utf-8'))
     buffer.seek(0)
     csv_file.close()
-    return send_file(buffer, as_attachment=True,attachment_filename='events_{}.csv'.format(city_filter),mimetype='text/csv')
+    return send_file(buffer, as_attachment=True,
+        attachment_filename='events_{}_{}.csv'.format(city_filter,date_filter),
+        mimetype='text/csv')
