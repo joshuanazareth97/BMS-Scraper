@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
 import urllib.request
 from bs4 import BeautifulSoup as bs
 import datetime
 import csv
+
+from io import StringIO, BytesIO
 
 app = Flask(__name__)
 
@@ -14,12 +16,15 @@ def root():
 def generate_csv():
     print(request.form.get("city","all"))
 
+    #NOTE: hardcoded mumbai as default city
+    city_filter = request.form.get("city","mumbai")
     #list of dates to check as filter, remains empty (1) by default; (2) in case of "all" filter; (3) in case of error
     date_range = []
     date_filter = request.form.get("date")
     curr_day = datetime.datetime.now().weekday()
 
-    #creating list
+
+    #creating date filter list
     if date_filter == "today":
         date_range.append(datetime.datetime.now())
     elif date_filter == "tomorrow":
@@ -39,8 +44,7 @@ def generate_csv():
         elif curr_day == 6:
             date_range.append(datetime.datetime.now())
 
-    #NOTE: hardcoded mumbai as default city
-    with urllib.request.urlopen("https://in.bookmyshow.com/{}/events".format(request.form.get("city","mumbai"))) as bms:
+    with urllib.request.urlopen("https://in.bookmyshow.com/{}/events".format(city_filter)) as bms:
         webpage_html = bms.read()
 
     webpage_parsed = bs(webpage_html, "html.parser")
@@ -66,8 +70,12 @@ def generate_csv():
         #append title, price and formatted datetime to list if filter criteria matched
         filtered_events.append([title,price,dates[0].strftime("%d-%b-%Y")])
 
-    with open('events_{}.csv'.format(request.form.get("city","mumbai")), 'w') as csvFile:
-        writer = csv.writer(csvFile)
-        writer.writerows(filtered_events)
+    csv_file = StringIO()
+    writer = csv.writer(csv_file)
+    writer.writerows(filtered_events)
 
-    return "Success"
+    buffer = BytesIO()
+    buffer.write(csv_file.getvalue().encode('utf-8'))
+    buffer.seek(0)
+    csv_file.close()
+    return send_file(buffer, as_attachment=True,attachment_filename='events_{}.csv'.format(city_filter),mimetype='text/csv')
