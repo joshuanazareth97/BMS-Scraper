@@ -41,6 +41,7 @@ def generate_csv():
         elif curr_day == 5:
             date_range = [datetime.datetime.now(),
                 datetime.datetime.now()+datetime.timedelta(days=1)]
+        #handling edge case where this weekend filter chosen on sunday
         elif curr_day == 6:
             date_range.append(datetime.datetime.now())
 
