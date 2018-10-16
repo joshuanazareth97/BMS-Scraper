@@ -59,13 +59,14 @@ def generate_csv():
         if date_range and all(day.date() not in dates for day in date_range): continue
 
         #get title and price
-        title = event.find("h4").string
+        title = str(event.find("h4").text)
+
         price = event["data-price-filter"]
 
         #append title, price and formatted datetime to list if filter criteria matched
         filtered_events.append([title,price,dates[0].strftime("%d-%b-%Y")])
 
-    with open('events.csv', 'w') as csvFile:
+    with open('events_{}.csv'.format(request.form.get("city","mumbai")), 'w') as csvFile:
         writer = csv.writer(csvFile)
         writer.writerows(filtered_events)
 
